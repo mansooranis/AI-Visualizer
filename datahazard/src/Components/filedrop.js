@@ -1,29 +1,34 @@
 import React, {useCallback} from 'react'
-import {useDropzone} from 'react-dropzone'
+import Dropzone from 'react-dropzone'
+import axios from 'axios'
 
 export default function MyDropzone() {
-  const onDrop = useCallback((acceptedFiles) => {
-    acceptedFiles.forEach((file) => {
-      const reader = new FileReader()
 
-      reader.onabort = () => console.log('file reading was aborted')
-      reader.onerror = () => console.log('file reading has failed')
-      reader.onload = () => {
-      // Do whatever you want with the file contents
-        
-        const binaryStr = reader.result
-        console.log(binaryStr)
-      }
-      reader.readAsArrayBuffer(file)
-    })
-    
-  }, [])
-  const {getRootProps, getInputProps} = useDropzone({onDrop})
+  const uploadfile = async (files) => {
+    console.log(files[0]);
+    try{
+      const formData = new FormData();
+      formData.append('file', files[0]);
+      const response = await axios.post('http://127.0.0.1:5000/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      //console.log(response);
+    }catch(err){
+      console.log(err);
+    }
+  
+  }
 
   return (
-    <div {...getRootProps()} className=" border-2 border-dashed h-52 flex items-center justify-center bg-slate-50 text-gray-600 font-light hover:cursor-pointer">
-      <input {...getInputProps()} />
-        <p>Drag 'n' drop some files here, or click to select files</p>
-    </div>
+    <Dropzone onDrop={acceptedFiles => uploadfile(acceptedFiles)}>
+      {({getRootProps, getInputProps}) => (
+        <div {...getRootProps()} className=" border-2 border-dashed h-52 flex items-center justify-center bg-slate-50 text-gray-600 font-light hover:cursor-pointer">
+          <input {...getInputProps()} />
+            <p>Drag 'n' drop some files here, or click to select files</p>
+        </div>
+        )}
+    </Dropzone>
   )
 }
