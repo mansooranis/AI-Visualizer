@@ -1,14 +1,12 @@
 import React from "react";
 import MyDropzone from "./filedrop";
 import {useSelector, useDispatch} from 'react-redux';
+import Graphs from "./Graphs";
+import Train from "./train";
 
 export default function (){
-    const showg = useSelector(state => state.data.showgraps);
-    const showm = useSelector(state => state.data.showmodels);
-
-    React.useEffect(() => {
-        showg?console.log("showg"):console.log("hideg");
-    }, [showg]);
+    const data = useSelector(state => state.data);
+    //const showm = useSelector(state => state.data.showmodels);
     
     return (
         <div className=" flex flex-col">
@@ -17,8 +15,8 @@ export default function (){
                     <MyDropzone/>
                 </div>
             </div>
-            {showg?<div>hello</div>:<></>}
-            {showm?<div></div>:<></>}
+            {data["showgraphs"]?<div><Graphs/> </div>:<></>}
+            {data["shownewmodel"]?<div><Train/></div>:<></>}
         </div>
     )
 }

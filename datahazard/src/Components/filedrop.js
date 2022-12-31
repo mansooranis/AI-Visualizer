@@ -4,38 +4,32 @@ import axios from 'axios'
 import Papa from "papaparse";
 import Table from 'react-bootstrap/Table';
 import Modeling from './Modeling';
+import { useSelector, useDispatch } from 'react-redux';
+import { setshownewmodel, setdatavalues, setselectedcols, setfile} from "../feature/data/dataSlice";
 const d3 = require('d3');
 
 export default function MyDropzone() {
+  const dispatch = useDispatch();
   const [columns, setColumns] = React.useState([]);
   const [showcols, setShowcols] = React.useState();
   const [data, setData] = React.useState([]);
   const [selected, setSelected] = React.useState([]);
   const [isFileUploaded, setIsFileUploaded] = React.useState(false);
+  const statedata = useSelector(state => state.data);
   
-  const handleSelect = (e) => {
-    //e.preventDefault();
+  const onSelect = async (e)=>{
+    //console.log(e.target.value);
     const value = e.target.value;
-    const isChecked = e.target.checked;
-    //e.target.checked = !e.target.checked;
-    //console.log(isChecked)
-    if (isChecked) {
-      const newlist = [...selected, value]
-      setSelected(newlist);
-      
-    }else{
-      const filteredlist = selected.filter((item) => item !== value);
-      //console.log(filteredlist);
-      setSelected(filteredlist)
-    }
-    //console.log(selected);
+    selected.push(value)
+    //console.log(selected)
   }
+
   React.useEffect(() => {
     const mappedcols = columns.map((column,key) => {
       return (<tr>
                 <td>{column}</td>
                 <td><div>
-                      <input id = {key} type="checkbox" value={column} onChange={handleSelect}/>
+                      <input id = {key} type="checkbox" value={column} onChange={onSelect}/>
                     </div>
                 </td>
                 <td>{data[0][column]}</td>
@@ -45,18 +39,20 @@ export default function MyDropzone() {
   }, [columns]);
   const onDrop = async (files) => {
     const reader = new FileReader()
+    dispatch(setfile(files));
     setIsFileUploaded(true);
     reader.onload =  ({target}) => { 
       const csv = Papa.parse(target.result, { header: true });
       const parsedData = csv?.data;
       setData(parsedData);
+      dispatch(setdatavalues(parsedData));
       //console.log(parsedData)
       const ccolumns = Object.keys(parsedData[0]);
       setColumns(ccolumns);
       const mappedcols = columns.map((column, key) => {(<tr>
         <td>{column}</td>
         <td><div>
-              <input id = {key} type="checkbox" value={column} onChange={handleSelect}/>
+              <input id = {key} type="checkbox" value={column} onChange={onSelect}/>
             </div>
         </td>
         <td>{data[0][column]}</td>
@@ -69,23 +65,27 @@ export default function MyDropzone() {
     
   }
 
-  const uploadfile = async (files) => {
-    //console.log(files[0]);
-    try{
-      const formData = new FormData();
-      formData.append('file', files[0]);
-      const response = await axios.post('http://127.0.0.1:5000/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      //console.log(response);
-    }catch(err){
-      console.log(err);
-    }
+  // const uploadfile = async (files) => {
+  //   //console.log(files[0]);
+  //   try{
+  //     const formData = new FormData();
+  //     formData.append('file', files[0]);
+  //     const response = await axios.post('http://127.0.0.1:5000/upload', formData, {
+  //       headers: {
+  //         'Content-Type': 'multipart/form-data'
+  //       }
+  //     });
+  //     //console.log(response);
+  //   }catch(err){
+  //     console.log(err);
+  //   }
   
-  }
-
+  // }
+  const onGenerate = React.useCallback(() => {
+    dispatch(setselectedcols(selected));
+    dispatch(setshownewmodel(true));
+    //console.log(columns);
+  }, []);
   return (
     <div className='flex flex-col justify-center items-center'>
       <Dropzone onDrop={acceptedFiles => {onDrop(acceptedFiles)}}>
@@ -111,7 +111,7 @@ export default function MyDropzone() {
             <tbody>
                 {showcols}
                 <tr>
-                  <td className = "hover:cursor-pointer text-blue-500" colSpan={3} onClick ={null}> Create Model </td>
+                  <td className = "hover:cursor-pointer text-blue-500" colSpan={3} onClick ={() => {onGenerate() }}> Create Model </td>
                 </tr>
             </tbody>
           </Table>

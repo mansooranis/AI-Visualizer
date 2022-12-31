@@ -7,4 +7,7 @@ export const store = configureStore({
     reducer: {
         data: dataSlice,
     },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+        serializableCheck: false,
+    }),
 });
