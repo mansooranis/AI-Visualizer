@@ -15,7 +15,8 @@ export default function MyDropzone() {
   const [data, setData] = React.useState([]);
   const [selected, setSelected] = React.useState([]);
   const [isFileUploaded, setIsFileUploaded] = React.useState(false);
-  const statedata = useSelector(state => state.data);
+  //const statedata = useSelector(state => state.data);
+  const [filename, setFilename] = React.useState();
   
   const onSelect = async (e)=>{
     //console.log(e.target.value);
@@ -41,6 +42,8 @@ export default function MyDropzone() {
     const reader = new FileReader()
     dispatch(setfile(files));
     setIsFileUploaded(true);
+    setFilename(files[0].name);
+    console.log(files[0].name);
     reader.onload =  ({target}) => { 
       const csv = Papa.parse(target.result, { header: true });
       const parsedData = csv?.data;
@@ -64,23 +67,6 @@ export default function MyDropzone() {
     //console.log(columns)
     
   }
-
-  // const uploadfile = async (files) => {
-  //   //console.log(files[0]);
-  //   try{
-  //     const formData = new FormData();
-  //     formData.append('file', files[0]);
-  //     const response = await axios.post('http://127.0.0.1:5000/upload', formData, {
-  //       headers: {
-  //         'Content-Type': 'multipart/form-data'
-  //       }
-  //     });
-  //     //console.log(response);
-  //   }catch(err){
-  //     console.log(err);
-  //   }
-  
-  // }
   const onGenerate = React.useCallback(() => {
     dispatch(setselectedcols(selected));
     dispatch(setshownewmodel(true));
@@ -97,6 +83,7 @@ export default function MyDropzone() {
           )}
       </Dropzone>
       {isFileUploaded?
+      <div className='text-left mt-3'> <text className=''>File Selected: {filename}</text>
       <div className='flex flex-row flex-wrap'>
         <div className='mt-5 pl-10 pr-10 text-sm self-start text-left font-medium'>
           <text className=' text-base'>Define Model:</text>
@@ -117,7 +104,7 @@ export default function MyDropzone() {
           </Table>
         </div>
         <Modeling columns = {columns} />
-      </div>:<></>
+      </div></div>:<></>
     }
     </div>
   )

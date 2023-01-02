@@ -71,7 +71,7 @@ export default function Modeling(props) {
         dispatch(setgraphs({xaxis:xvals, yaxis:yvals}));
     }, [xvals,yvals]);
   return (
-    <div className="mt-5 self-start">
+    <div className="mt-5 text-center">
         <text className="flex ">Generate Graphs:</text>
         <Table bordered hover responsive size="sm" className="mt-4 w-[400px]">
             <thead>

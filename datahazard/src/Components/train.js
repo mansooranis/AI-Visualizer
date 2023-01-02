@@ -31,10 +31,11 @@ export default function Train(){
                 'Content-Type': 'multipart/form-data'
                 }
             });
-            console.log(response.data);
+            //console.log(response.data);
             setBackendresult(response.data);
             setShowresult(true);
-            const c = response.data["coef"].map((item,index)=>{return <div>{xarray[index]} : {item}</div>})
+            console.log(response.data["coef"])
+            const c = response.data["coef"][0].map((item,index)=>{return <div>{xarray[index]} : {item}</div>})
             //console.log(c)
             setCoef(c);
 
@@ -59,7 +60,7 @@ export default function Train(){
             <Select className='w-[500px] mt-1 z-100' options = {data["selectedcols"].map((item)=>{return {value:item, label:item}})} onChange={(change)=>setY(change.value)}/>
 
             <div className='text-left mt-3'>
-                <button className=' border w-[100px] text-gray-500' onClick={onSubmit}>Train Data</button>
+                <button className=' border w-[100px] text-gray-500 mb-3' onClick={onSubmit}>Train Data</button>
             </div>
             {showresult? <div className='text-left mt-3'>
                 <div className='mt-3'><h3>Results</h3></div>
